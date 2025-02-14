@@ -148,7 +148,7 @@ users.forEach((user) => {
             let userDataList = document.querySelector('#user-data')
             userDataList.innerHTML = ''
             const li = document.createElement("li");
-            li.textContent = `${data.id}: ${data.username} (${data.email})`;
+            li.textContent = `${data.id}: ${data.username} (${data.email}) ${data.full_name} ${data.disabled}`;
             userDataList.appendChild(li)
             showRequestStatusSucces('Успешно!')
           fetchUsers();
