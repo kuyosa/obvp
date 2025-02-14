@@ -2,3 +2,8 @@ fastapi[standard]
 sqlalchemy
 pymysql
 pydantic
+bcrypt
+passlib
+pyJWT
+httpx
+pytest

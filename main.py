@@ -11,8 +11,31 @@ from passlib.context import CryptContext
 import jwt
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta, timezone
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+
+
+
+
 # Создание объекта FastAPI
 app = FastAPI()
+
+# origins = [
+#     "http://localhost.tiangolo.com",
+#     "https://localhost.tiangolo.com",
+#     "http://localhost",
+#     "http://localhost:8080",
+# ]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 # Настройка базы данных MySQL
 SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:@localhost/isp_r_Korovin"
@@ -33,7 +56,7 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, index=True)
+    username = Column(String(50), index=True)
     email = Column(String(100), unique=True, index=True)
     full_name = Column(String(100), nullable=True)
     hashed_password = Column(String(100))
@@ -158,6 +181,12 @@ async def get_current_active_user(current_user: Annotated[User, Depends(get_curr
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
+
+
+@app.get("/", response_class=HTMLResponse)
+async def get_client():
+    with open("static/index.html", "r",encoding="utf-8") as file:
+        return file.read()
 # Маршрут для удаления пользователя по ID
 @app.delete("/users/{user_id}", response_model=UserResponse)
 def delete_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
